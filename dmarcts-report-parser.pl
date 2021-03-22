@@ -891,7 +891,7 @@ sub storeXMLInDatabase {
 
 		my ($dkim, $dkimresult, $spf, $spfresult, $reason);
 		if(ref $r{'auth_results'} ne "HASH"){
-			warn "$scriptname: $org: $id: Report has no auth_results data. Skipped.\n";
+			warn "$scriptname: $org: $id: Record has no auth_results data. Skipped.\n";
 			return 0;
 		}
 		my $rp = $r{'auth_results'}->{'dkim'};
@@ -1001,36 +1001,36 @@ sub storeXMLInDatabase {
 		return 1;
 	}
 
-	my $res = 1;
+	my $records_done = 0;
 	if(ref $record eq "HASH") {
 		if ($debug){
 			print "single record\n";
 		}
-		$res = -1 if !dorow($serial,$record,$org,$id);
+		$records_done += dorow($serial,$record,$org,$id);
 	} elsif(ref $record eq "ARRAY") {
 		if ($debug){
 			print "multi record\n";
 		}
 		foreach my $row (@$record) {
-			$res = -1 if !dorow($serial,$row,$org,$id);
+			$records_done += dorow($serial,$row,$org,$id);
 		}
 	} else {
 		warn "$scriptname: $org: $id: mystery type " . ref($record) . "\n";
 	}
 
-	if ($debug && $res <= 0) {
-		print "Result $res XML: $xml->{raw_xml}\n";
+	if ($debug && $records_done == 0) {
+		print "Result no records XML: $xml->{raw_xml}\n";
 	}
 
-	if ($res <= 0) {
+	if ($records_done == 0) {
 		if ($db_tx_support) {
-			warn "$scriptname: $org: $id: Cannot add records to rptrecord. Rolling back DB transaction.\n";
+			warn "$scriptname: $org: $id: No records added to rptrecord. Rolling back DB transaction.\n";
 			$dbh->do(qq{ROLLBACK});
 			if ($dbh->errstr) {
 				warn "$scriptname: $org: $id: Cannot rollback transaction.\n";
 			}
 		} else {
-			warn "$scriptname: $org: $id: errors while adding to rptrecord, serial $serial records likely obsolete.\n";
+			warn "$scriptname: $org: $id: errors while adding records to rptrecord, entries with serial $serial likely obsolete.\n";
 		}
 	} else {
 		if ($db_tx_support) {
@@ -1040,7 +1040,7 @@ sub storeXMLInDatabase {
 			}
 		}
 	}
-	return $res;
+	return $records_done;
 }
 
 
