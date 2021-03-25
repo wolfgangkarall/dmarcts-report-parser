@@ -75,8 +75,8 @@ use File::Basename ();
 use File::MimeInfo;
 use IO::Socket::SSL;
 #use IO::Socket::SSL 'debug3';
-
-
+use Fcntl qw(LOCK_EX LOCK_NB);
+use File::NFSLock;
 
 ################################################################################
 ### usage ######################################################################
@@ -271,6 +271,9 @@ checkDatabase($dbh);
 
 # Process messages based on $reports_source.
 if ($reports_source == TS_IMAP) {
+	my $lock = File::NFSLock->new($0, LOCK_EX|LOCK_NB);
+	die "$scriptname: another instance is already running, not allowed in IMAP mode.\n" unless $lock;
+
 	my $socketargs = '';
 	my $processedReport = 0;
 
@@ -371,6 +374,8 @@ if ($reports_source == TS_IMAP) {
 
 	# We're all done with IMAP here.
 	$imap->logout();
+
+	$lock->unlock;
 	if ( $debug || $processInfo ) { print "$scriptname: Processed $processedReport emails.\n"; }
 
 } else { # TS_MESSAGE_FILE or TS_XML_FILE or TS_MBOX_FILE
