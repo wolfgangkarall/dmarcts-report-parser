@@ -16,11 +16,11 @@ innodb_file_per_table	= true
 
 To install dependencies...
 
-### on Debian:
+### on Debian/Ubuntu:
 ```
 apt-get install libfile-mimeinfo-perl libmail-imapclient-perl libmime-tools-perl libxml-simple-perl \
 libclass-dbi-mysql-perl libio-socket-inet6-perl libio-socket-ip-perl libperlio-gzip-perl \
-libmail-mbox-messageparser-perl unzip
+libmail-mbox-messageparser-perl libfile-nfslock-perl unzip
 ```
 ### on Fedora (Fedora 23):
 ```
