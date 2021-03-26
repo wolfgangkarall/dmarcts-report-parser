@@ -67,6 +67,7 @@ use MIME::Words qw(decode_mimewords);
 use MIME::Parser;
 use MIME::Parser::Filer;
 use XML::Simple;
+use HTML::Tidy;
 use DBI;
 use Socket;
 use Socket6;
@@ -755,6 +756,13 @@ sub getXMLFromXMLString {
 
 	eval {
 		my $xs = XML::Simple->new();
+		my $tidy = HTML::Tidy->new( {
+				'input-encoding' => 'utf8',
+				'char-encoding' => 'ascii',
+				'input-xml' => 1,
+				'output-xml' => 1,
+			} );
+		$raw_xml = $tidy->clean($raw_xml);
 		my $ref = $xs->XMLin($raw_xml, SuppressEmpty => '');
 		$ref->{'raw_xml'} = $raw_xml;
 
