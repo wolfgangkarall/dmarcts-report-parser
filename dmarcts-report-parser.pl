@@ -265,7 +265,7 @@ if (exists $options{info}) {$processInfo = 1;}
 
 # Setup connection to database server.
 my $dbh = DBI->connect("DBI:mysql:database=$dbname;host=$dbhost;port=$dbport",
-	$dbuser, $dbpass)
+	$dbuser, $dbpass, { 'mysql_enable_utf8mb4' => 1 })
 or die "$scriptname: Cannot connect to database\n";
 checkDatabase($dbh);
 
