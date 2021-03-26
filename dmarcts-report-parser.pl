@@ -757,7 +757,6 @@ sub getXMLFromXMLString {
 	eval {
 		my $xs = XML::Simple->new();
 		my $tidy = HTML::Tidy->new( {
-				'input-encoding' => 'utf8',
 				'char-encoding' => 'ascii',
 				'input-xml' => 1,
 				'output-xml' => 1,
